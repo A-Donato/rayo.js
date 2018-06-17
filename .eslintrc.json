@@ -8,7 +8,7 @@
   "rules": {
     "arrow-parens": ["error", "always"],
     "no-underscore-dangle": "error",
-    "no-console": "error",
+    "no-console": 0,
     "prettier/prettier": [
       "error",
       {

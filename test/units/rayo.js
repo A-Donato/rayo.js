@@ -11,7 +11,9 @@ const fake = {
 const test = (server) => {
   should(server).be.an.Object();
   should(server).have.properties('server', 'dispatch', 'start', 'step');
-  should(server.server).be.an.Object();
+  if (server.server) {
+    should(server.server).be.an.Object();
+  }
   should(server.dispatch).be.an.Function();
   should(server.start).be.an.Function();
   should(server.step).be.an.Function();
@@ -21,12 +23,17 @@ const test = (server) => {
 };
 
 let sandbox;
+let server = null;
 module.exports = () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    server = rayo({ port: 5050, cluster: false });
   });
 
-  afterEach(() => sandbox.restore());
+  afterEach(() => {
+    sandbox.restore();
+    server = null;
+  });
 
   it('Rayo', (done) => {
     test(rayo());
@@ -34,7 +41,6 @@ module.exports = () => {
   });
 
   it('Start (without callback)', (done) => {
-    const server = rayo({ port: 5050 });
     const httpServer = server.start();
 
     setTimeout(() => {
@@ -47,7 +53,6 @@ module.exports = () => {
   });
 
   it('Start (with callback)', (done) => {
-    const server = rayo({ port: 5050 });
     const httpServer = server.start((info) => {
       should(info.port).be.a.Number();
       should(info.port).be.equal(5050);
@@ -62,7 +67,7 @@ module.exports = () => {
   });
 
   it('Dispatch (defined verb)', (done) => {
-    const server = rayo({ port: 5050 }).get('/', () => {});
+    server.get('/', () => {});
     const stack = server.dispatch(fake.req, fake.res);
 
     setTimeout(() => {
@@ -86,7 +91,7 @@ module.exports = () => {
       should(response).be.equal('Page not found.');
     });
 
-    const server = rayo({ port: 5050 }).post('/', () => {});
+    server.post('/', () => {});
     const stack = server.dispatch(fake.req, fake.res);
 
     setTimeout(() => {
@@ -97,8 +102,9 @@ module.exports = () => {
   });
 
   it('Dispatch (custom notFound function)', (done) => {
-    const server = rayo({
+    server = rayo({
       port: 5050,
+      cluster: false,
       notFound: (req) => {
         should(req.method).be.a.String();
         should(req.method).be.equal('GET');
@@ -113,10 +119,7 @@ module.exports = () => {
   });
 
   it('step (without stack)', (done) => {
-    const server = rayo({
-      port: 5050
-    }).post('/', () => {});
-
+    server.post('/', () => {});
     setTimeout(() => {
       test(server);
       try {
@@ -132,10 +135,7 @@ module.exports = () => {
   });
 
   it('step (with stack)', (done) => {
-    const server = rayo({
-      port: 5050
-    }).post('/', () => {});
-
+    server.post('/', () => {});
     setTimeout(() => {
       test(server);
       const nextStackFunction = server.step(fake.req, fake.res, [
@@ -162,10 +162,7 @@ module.exports = () => {
       should(response).be.equal('The error.');
     });
 
-    const server = rayo({
-      port: 5050
-    }).post('/', () => {});
-
+    server.post('/', () => {});
     setTimeout(() => {
       test(server);
       server.step(fake.req, fake.res, [], 'The error.');
@@ -174,8 +171,9 @@ module.exports = () => {
   });
 
   it('step (with error and custom onError)', (done) => {
-    const server = rayo({
+    server = rayo({
       port: 5050,
+      cluster: false,
       onError: (error) => {
         should(error).be.a.String();
         should(error).be.equal('The error.');

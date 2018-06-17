@@ -1,5 +1,6 @@
 const http = require('http');
 const parseurl = require('parseurl');
+const storm = require('../plugins/storm');
 const { parse } = require('querystring');
 const Bridge = require('./bridge');
 
@@ -16,20 +17,29 @@ class Rayo extends Bridge {
     ({
       port: this.port,
       host: this.host,
+      cluster: this.cluster = true,
       onError: this.onError = null,
       notFound: this.notFound = null,
-      server: this.server = http.createServer()
+      server: this.server = null
     } = options);
     this.dispatch = this.dispatch.bind(this);
   }
 
   start(callback = function cb() {}) {
-    this.server.listen(this.port, this.host);
-    this.server.on('request', this.dispatch);
-    this.server.on('listening', () => {
-      this.through();
-      callback(this.server.address());
-    });
+    const server = (workerPid = null) => {
+      this.server = this.server || http.createServer();
+      this.server.listen(this.port, this.host);
+      this.server.on('request', this.dispatch);
+      this.server.on('listening', () => {
+        this.through();
+        const address = this.server.address();
+        address.workerePid = workerPid;
+        callback(address);
+      });
+    };
+
+    const a = this.cluster ? storm(server, { Rayo }) : server();
+    console.log(a);
 
     return this.server;
   }
