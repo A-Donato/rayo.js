@@ -198,7 +198,6 @@ const fn = (error, req, res, step) => {
       </blockquote>
       <p>This method is basically an alias of the <a href="#routeverb-path-handlers">.route</a> method, with the difference that the verb is defined by the method name itself.</p>
       <pre>const rayo = require('rayo');
-
 /**
  * Setup a path ('/') on the specified HTTP verbs.
  */
@@ -214,7 +213,6 @@ rayo({ port: 5050 })
         Requests which match any verb and the given path will be routed through the specified handlers.
       </blockquote>
       <pre>const rayo = require('rayo');
-
 /**
  * Setup a path ('/') on all HTTP verbs.
  */
@@ -228,19 +226,16 @@ rayo({ port: 5050 })
         All requests, any verb and any path, will be routed through the specified handlers.
       </blockquote>
       <pre>const rayo = require('rayo');
-
 // "age" handler
 const age = (req, res, step) =&gt; {
   req.age = 21;
   step();
 };
-
 // "name" handler
 const name = (req, res, step) =&gt; {
   req.name = 'Rayo';
   step();
 };
-
 rayo({ port: 5050 })
   .through(age, name)
   .get('/', (req, res) =&gt; res.end(`${req.age} | ${req.name}`))
@@ -254,7 +249,6 @@ rayo({ port: 5050 })
         Requests which match the given verb and path will be routed through the specified handlers.
       </blockquote>
       <pre>const rayo = require('rayo');
-
 rayo({ port: 5050 })
   .route('GET', '/', (req, res) =&gt; res.end('Thunderstruck, GET'))
   .start();</pre>
@@ -268,9 +262,7 @@ rayo({ port: 5050 })
         number of bridges and Rayo will automagically take care of mapping them.</p>
       <p>What makes <code>bridges</code> really awesome is the fact that allow very granular control over what your application exposes. For example, enable <a href="https://github.com/GetRayo/rayo.js/tree/master/packages/plugins/compress">content compression</a> only on certain paths.</p>
       <pre>const rayo = require('rayo');
-
 const server = rayo({ port: 5050 });
-
 /**
  * Bridge the `/home` path to the `GET` and `HEAD` verbs.
  */
@@ -278,7 +270,6 @@ server
   .bridge('/home')
   .get((req, res) =&gt; res.end('You are home, GET'))
   .head((req, res) =&gt; res.end('You are home, HEAD'));
-
 /**
  * Bridge the `/game` path to the `POST` and `PUT` verbs.
  */
@@ -291,12 +282,10 @@ const auth = (req, res, step) =&gt; {
   req.isAuthenticated = true;
   step();
 };
-
 const session = (req, res, step) =&gt; {
   req.hasSession = true;
   step();
 };
-
 /**
  * Bridge the `/account` path to the `GET`, `POST` and `PUT` verbs
  * and through two handlers.
@@ -307,7 +296,6 @@ server
   .get((req, res) =&gt; res.end('You are at the account, GET'))
   .post((req, res) =&gt; res.end('You are at the account, POST'))
   .put((req, res) =&gt; res.end('You are at the account, PUT'));
-
 server.start();</pre>
       <h4 id="startcallback">.start(callback)</h4>
       <pre>@param   {function} [callback] - Invoked on the server's `listening` event.
@@ -316,9 +304,7 @@ server.start();</pre>
         <p>Rayo will return the server address with the callback, if one was provided. Useful, for example, to get the server port in case no port was specified in the options.</p>
         <p>Starts Rayo -Your server is now listening for incoming requests.</p>
       </blockquote>
-
       <pre>const rayo = require('rayo');
-
 rayo({ port: 5050 });
   .get((req, res) =&gt; res.end('Thunderstruck'))
   .start((address) =&gt; {
